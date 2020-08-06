@@ -1,0 +1,23 @@
+parameters:
+    ignoreErrors:
+        -
+            message: '/Parameter \#1 \$name of method Workerman\\Protocols\\Http\\Request\:\:header\(\) expects null, string given\./'
+            path: %currentWorkingDirectory%/src/Adapter/BlackfireOnMessageAdapter.php
+        -
+            message: '/Argument of an invalid type string supplied for foreach, only iterables are supported\./'
+            path: %currentWorkingDirectory%/src/PsrRequestFactory.php
+        -
+            message: '/Parameter \#1 \$cookies of method Psr\\Http\\Message\\ServerRequestInterface\:\:withCookieParams\(\) expects array, string\|null given\./'
+            path: %currentWorkingDirectory%/src/PsrRequestFactory.php
+        -
+            message: '/uploadedFiles/'
+            path: %currentWorkingDirectory%/src/PsrRequestFactory.php
+        -
+            message: '/createStreamFromFile/'
+            path: %currentWorkingDirectory%/src/PsrRequestFactory.php
+        -
+            message: '/createUploadedFile/'
+            path: %currentWorkingDirectory%/src/PsrRequestFactory.php
+        -
+            message: '/Parameter \#2 \$reason_phrase of method Workerman\\Protocols\\Http\\Response\:\:withStatus\(\) expects null, string given\./'
+            path: %currentWorkingDirectory%/src/WorkermanResponseEmitter.php
