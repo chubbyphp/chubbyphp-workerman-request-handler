@@ -2,10 +2,22 @@
 
 [![Build Status](https://api.travis-ci.org/chubbyphp/chubbyphp-workerman-request-handler.png?branch=master)](https://travis-ci.org/chubbyphp/chubbyphp-workerman-request-handler)
 [![Coverage Status](https://coveralls.io/repos/github/chubbyphp/chubbyphp-workerman-request-handler/badge.svg?branch=master)](https://coveralls.io/github/chubbyphp/chubbyphp-workerman-request-handler?branch=master)
+[![Infection MSI](https://badge.stryker-mutator.io/github.com/chubbyphp/chubbyphp-workerman-request-handler/master)](https://travis-ci.org/chubbyphp/chubbyphp-workerman-request-handler)
 [![Latest Stable Version](https://poser.pugx.org/chubbyphp/chubbyphp-workerman-request-handler/v/stable.png)](https://packagist.org/packages/chubbyphp/chubbyphp-workerman-request-handler)
 [![Total Downloads](https://poser.pugx.org/chubbyphp/chubbyphp-workerman-request-handler/downloads.png)](https://packagist.org/packages/chubbyphp/chubbyphp-workerman-request-handler)
 [![Monthly Downloads](https://poser.pugx.org/chubbyphp/chubbyphp-workerman-request-handler/d/monthly)](https://packagist.org/packages/chubbyphp/chubbyphp-workerman-request-handler)
-[![Daily Downloads](https://poser.pugx.org/chubbyphp/chubbyphp-workerman-request-handler/d/daily)](https://packagist.org/packages/chubbyphp/chubbyphp-workerman-request-handler)
+
+[![bugs](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=bugs)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![code_smells](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=code_smells)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![coverage](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=coverage)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![duplicated_lines_density](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![ncloc](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=ncloc)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![sqale_rating](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![alert_status](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=alert_status)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![reliability_rating](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![security_rating](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=security_rating)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![sqale_index](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=sqale_index)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
+[![vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=chubbyphp_chubbyphp-workerman-request-handler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=chubbyphp_chubbyphp-workerman-request-handler)
 
 ## Description
 
@@ -13,7 +25,7 @@ A request handler adapter for workerman, using PSR-7, PSR-15 and PSR-17.
 
 ## Requirements
 
- * php: ^7.2
+ * php: ^7.2|^8.0
  * [psr/http-factory][2]: ^1.0.1
  * [psr/http-message][3]: ^1.0.1
  * [psr/http-server-handler][4]: ^1.0.1
