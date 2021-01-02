@@ -10,15 +10,9 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
 
 final class NewRelicOnMessageAdapter implements OnMessageInterface
 {
-    /**
-     * @var OnMessageInterface
-     */
-    private $onRequest;
+    private OnMessageInterface $onRequest;
 
-    /**
-     * @var string
-     */
-    private $appname;
+    private string $appname;
 
     public function __construct(OnMessageInterface $onRequest, string $appname)
     {

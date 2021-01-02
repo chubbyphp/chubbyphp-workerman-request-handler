@@ -10,20 +10,11 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
 
 final class OnMessage implements OnMessageInterface
 {
-    /**
-     * @var PsrRequestFactoryInterface
-     */
-    private $psrRequestFactory;
+    private PsrRequestFactoryInterface $psrRequestFactory;
 
-    /**
-     * @var WorkermanResponseEmitterInterface
-     */
-    private $workermanResponseEmitter;
+    private WorkermanResponseEmitterInterface $workermanResponseEmitter;
 
-    /**
-     * @var RequestHandlerInterface
-     */
-    private $requestHander;
+    private RequestHandlerInterface $requestHander;
 
     public function __construct(
         PsrRequestFactoryInterface $psrRequestFactory,

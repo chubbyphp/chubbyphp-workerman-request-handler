@@ -13,20 +13,11 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
 
 final class PsrRequestFactory implements PsrRequestFactoryInterface
 {
-    /**
-     * @var ServerRequestFactoryInterface
-     */
-    private $serverRequestFactory;
+    private ServerRequestFactoryInterface $serverRequestFactory;
 
-    /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
+    private StreamFactoryInterface $streamFactory;
 
-    /**
-     * @var UploadedFileFactoryInterface
-     */
-    private $uploadedFileFactory;
+    private UploadedFileFactoryInterface $uploadedFileFactory;
 
     public function __construct(
         ServerRequestFactoryInterface $serverRequestFactory,
