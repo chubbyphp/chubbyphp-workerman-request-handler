@@ -29,7 +29,8 @@ A request handler adapter for workerman, using PSR-7, PSR-15 and PSR-17.
  * [psr/http-factory][2]: ^1.0.1
  * [psr/http-message][3]: ^1.0.1
  * [psr/http-server-handler][4]: ^1.0.1
- * [workerman/workerman][5]: ^4.0.6
+ * [psr/log][5]: ^1.1.4
+ * [workerman/workerman][6]: ^4.0.6
 
 ## Installation
 
@@ -136,4 +137,5 @@ Dominik Zogg 2021
 [2]: https://packagist.org/packages/psr/http-factory
 [3]: https://packagist.org/packages/psr/http-message
 [4]: https://packagist.org/packages/psr/http-server-handler
-[5]: https://packagist.org/packages/workerman/workerman
+[5]: https://packagist.org/packages/psr/log
+[6]: https://packagist.org/packages/workerman/workerman
