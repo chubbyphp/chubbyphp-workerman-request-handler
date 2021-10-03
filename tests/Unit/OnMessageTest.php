@@ -28,29 +28,29 @@ final class OnMessageTest extends TestCase
 
     public function testInvoke(): void
     {
-        /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
 
-        /** @var WorkermanRequest|MockObject $workermanRequest */
+        /** @var MockObject|WorkermanRequest $workermanRequest */
         $workermanRequest = $this->getMockByCalls(WorkermanRequest::class);
 
-        /** @var ServerRequestInterface|MockObject $request */
+        /** @var MockObject|ServerRequestInterface $request */
         $request = $this->getMockByCalls(ServerRequestInterface::class);
 
-        /** @var ResponseInterface|MockObject $response */
+        /** @var MockObject|ResponseInterface $response */
         $response = $this->getMockByCalls(ResponseInterface::class);
 
-        /** @var PsrRequestFactoryInterface|MockObject $psrRequestFactory */
+        /** @var MockObject|PsrRequestFactoryInterface $psrRequestFactory */
         $psrRequestFactory = $this->getMockByCalls(PsrRequestFactoryInterface::class, [
             Call::create('create')->with($workermanRequest)->willReturn($request),
         ]);
 
-        /** @var WorkermanResponseEmitterInterface|MockObject $workermanResponseEmitter */
+        /** @var MockObject|WorkermanResponseEmitterInterface $workermanResponseEmitter */
         $workermanResponseEmitter = $this->getMockByCalls(WorkermanResponseEmitterInterface::class, [
             Call::create('emit')->with($response, $workermanTcpConnection),
         ]);
 
-        /** @var RequestHandlerInterface|MockObject $workermanRequestHandler */
+        /** @var MockObject|RequestHandlerInterface $workermanRequestHandler */
         $workermanRequestHandler = $this->getMockByCalls(RequestHandlerInterface::class, [
             Call::create('handle')->with($request)->willReturn($response),
         ]);

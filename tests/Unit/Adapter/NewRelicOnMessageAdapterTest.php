@@ -9,7 +9,7 @@ namespace Chubbyphp\WorkermanRequestHandler\Adapter
         /**
          * @var array<int, array>
          */
-        private static $calls = [];
+        private static array $calls = [];
 
         public static function add(string $appname, ?string $license = null): void
         {
@@ -40,7 +40,7 @@ namespace Chubbyphp\WorkermanRequestHandler\Adapter
         /**
          * @var array<int, array>
          */
-        private static $calls = [];
+        private static array $calls = [];
 
         public static function add(bool $ignore): void
         {
@@ -94,13 +94,13 @@ namespace Chubbyphp\Tests\WorkermanRequestHandler\Unit\Adapter
             TestNewRelicStartTransaction::reset();
             TestNewRelicEndTransaction::reset();
 
-            /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+            /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
             $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
 
-            /** @var WorkermanRequest|MockObject $workermanRequest */
+            /** @var MockObject|WorkermanRequest $workermanRequest */
             $workermanRequest = $this->getMockByCalls(WorkermanRequest::class);
 
-            /** @var OnMessageInterface|MockObject $onMessage */
+            /** @var MockObject|OnMessageInterface $onMessage */
             $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
                 Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
             ]);

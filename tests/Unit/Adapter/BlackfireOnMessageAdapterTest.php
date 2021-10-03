@@ -30,15 +30,15 @@ final class BlackfireOnMessageAdapterTest extends TestCase
 
     public function testInvokeWithoutHeaderWithoutConfigAndWithoutLogger(): void
     {
-        /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
 
-        /** @var WorkermanRequest|MockObject $workermanRequest */
+        /** @var MockObject|WorkermanRequest $workermanRequest */
         $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
             Call::create('header')->with('x-blackfire-query', null)->willReturn(null),
         ]);
 
-        /** @var OnMessageInterface|MockObject $onMessage */
+        /** @var MockObject|OnMessageInterface $onMessage */
         $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
             Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
         ]);
@@ -52,20 +52,20 @@ final class BlackfireOnMessageAdapterTest extends TestCase
 
     public function testInvokeWithoutConfigAndWithoutLogger(): void
     {
-        /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
 
-        /** @var WorkermanRequest|MockObject $workermanRequest */
+        /** @var MockObject|WorkermanRequest $workermanRequest */
         $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
             Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
         ]);
 
-        /** @var OnMessageInterface|MockObject $onMessage */
+        /** @var MockObject|OnMessageInterface $onMessage */
         $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
             Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
         ]);
 
-        /** @var Probe|MockObject $probe */
+        /** @var MockObject|Probe $probe */
         $probe = $this->getMockByCalls(Probe::class);
 
         /** @var Client|MockObject $client */
@@ -80,15 +80,15 @@ final class BlackfireOnMessageAdapterTest extends TestCase
 
     public function testInvokeWithConfigAndWithLogger(): void
     {
-        /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
 
-        /** @var WorkermanRequest|MockObject $workermanRequest */
+        /** @var MockObject|WorkermanRequest $workermanRequest */
         $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
             Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
         ]);
 
-        /** @var OnMessageInterface|MockObject $onMessage */
+        /** @var MockObject|OnMessageInterface $onMessage */
         $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
             Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
         ]);
@@ -96,7 +96,7 @@ final class BlackfireOnMessageAdapterTest extends TestCase
         /** @var Configuration|MockObject $config */
         $config = $this->getMockByCalls(Configuration::class);
 
-        /** @var Probe|MockObject $probe */
+        /** @var MockObject|Probe $probe */
         $probe = $this->getMockByCalls(Probe::class);
 
         /** @var Client|MockObject $client */
@@ -114,15 +114,15 @@ final class BlackfireOnMessageAdapterTest extends TestCase
 
     public function testInvokeWithExceptionOnCreateProbe(): void
     {
-        /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
 
-        /** @var WorkermanRequest|MockObject $workermanRequest */
+        /** @var MockObject|WorkermanRequest $workermanRequest */
         $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
             Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
         ]);
 
-        /** @var OnMessageInterface|MockObject $onMessage */
+        /** @var MockObject|OnMessageInterface $onMessage */
         $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
             Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
         ]);
@@ -148,15 +148,15 @@ final class BlackfireOnMessageAdapterTest extends TestCase
 
     public function testInvokeWithExceptionOnProbeEnd(): void
     {
-        /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
 
-        /** @var WorkermanRequest|MockObject $workermanRequest */
+        /** @var MockObject|WorkermanRequest $workermanRequest */
         $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
             Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
         ]);
 
-        /** @var OnMessageInterface|MockObject $onMessage */
+        /** @var MockObject|OnMessageInterface $onMessage */
         $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
             Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
         ]);
@@ -164,7 +164,7 @@ final class BlackfireOnMessageAdapterTest extends TestCase
         /** @var Configuration|MockObject $config */
         $config = $this->getMockByCalls(Configuration::class);
 
-        /** @var Probe|MockObject $probe */
+        /** @var MockObject|Probe $probe */
         $probe = $this->getMockByCalls(Probe::class);
 
         $exception = new LogicException('Something went wrong');

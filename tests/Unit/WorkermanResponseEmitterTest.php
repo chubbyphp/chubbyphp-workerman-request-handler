@@ -31,12 +31,12 @@ final class WorkermanResponseEmitterTest extends TestCase
             'Content-Type' => ['application/json'],
         ];
 
-        /** @var StreamInterface|MockObject $responseBody */
+        /** @var MockObject|StreamInterface $responseBody */
         $responseBody = $this->getMockByCalls(StreamInterface::class, [
             Call::create('__toString')->with()->willReturn('This is the body.'),
         ]);
 
-        /** @var ResponseInterface|MockObject $response */
+        /** @var MockObject|ResponseInterface $response */
         $response = $this->getMockByCalls(ResponseInterface::class, [
             Call::create('getStatusCode')->with()->willReturn(200),
             Call::create('getReasonPhrase')->with()->willReturn('OK'),
@@ -44,7 +44,7 @@ final class WorkermanResponseEmitterTest extends TestCase
             Call::create('getBody')->with()->willReturn($responseBody),
         ]);
 
-        /** @var WorkermanTcpConnection|MockObject $workermanTcpConnection */
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class, [
             Call::create('send')
                 ->with(
