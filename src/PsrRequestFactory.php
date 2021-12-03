@@ -36,11 +36,17 @@ final class PsrRequestFactory implements PsrRequestFactoryInterface
             $workermanRequest->uri()
         );
 
-        foreach ($workermanRequest->header() as $name => $value) {
+        /** @var array<string, string> $headers */
+        $headers = $workermanRequest->header();
+
+        foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
         }
 
-        $request = $request->withCookieParams($workermanRequest->cookie());
+        /** @var array<string, string> $cookies */
+        $cookies = $workermanRequest->cookie();
+
+        $request = $request->withCookieParams($cookies);
         $request = $request->withQueryParams($workermanRequest->get());
         $request = $request->withParsedBody($workermanRequest->post());
         $request = $request->withUploadedFiles($this->uploadedFiles($workermanRequest->file()));
