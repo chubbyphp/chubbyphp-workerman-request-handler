@@ -10,20 +10,11 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
 
 final class OnMessage implements OnMessageInterface
 {
-    private PsrRequestFactoryInterface $psrRequestFactory;
-
-    private WorkermanResponseEmitterInterface $workermanResponseEmitter;
-
-    private RequestHandlerInterface $requestHander;
-
     public function __construct(
-        PsrRequestFactoryInterface $psrRequestFactory,
-        WorkermanResponseEmitterInterface $workermanResponseEmitter,
-        RequestHandlerInterface $requestHander
+        private PsrRequestFactoryInterface $psrRequestFactory,
+        private WorkermanResponseEmitterInterface $workermanResponseEmitter,
+        private RequestHandlerInterface $requestHander
     ) {
-        $this->psrRequestFactory = $psrRequestFactory;
-        $this->workermanResponseEmitter = $workermanResponseEmitter;
-        $this->requestHander = $requestHander;
     }
 
     public function __invoke(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): void
