@@ -42,7 +42,7 @@ final class OnMessageTest extends TestCase
 
         /** @var MockObject|PsrRequestFactoryInterface $psrRequestFactory */
         $psrRequestFactory = $this->getMockByCalls(PsrRequestFactoryInterface::class, [
-            Call::create('create')->with($workermanRequest)->willReturn($request),
+            Call::create('create')->with($workermanTcpConnection, $workermanRequest)->willReturn($request),
         ]);
 
         /** @var MockObject|WorkermanResponseEmitterInterface $workermanResponseEmitter */

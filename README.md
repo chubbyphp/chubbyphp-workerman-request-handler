@@ -37,7 +37,7 @@ A request handler adapter for workerman, using PSR-7, PSR-15 and PSR-17.
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-workerman-request-handler][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-workerman-request-handler "^1.2"
+composer require chubbyphp/chubbyphp-workerman-request-handler "^2.0"
 ```
 
 ## Usage
