@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use Workerman\Connection\TcpConnection as WorkermanTcpConnection;
 use Workerman\Protocols\Http\Request as WorkermanRequest;
 
 final class PsrRequestFactory implements PsrRequestFactoryInterface
@@ -20,11 +21,12 @@ final class PsrRequestFactory implements PsrRequestFactoryInterface
     ) {
     }
 
-    public function create(WorkermanRequest $workermanRequest): ServerRequestInterface
+    public function create(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): ServerRequestInterface
     {
         $request = $this->serverRequestFactory->createServerRequest(
             $workermanRequest->method(),
-            $workermanRequest->uri()
+            $workermanRequest->uri(),
+            $this->createServerParams($workermanTcpConnection),
         );
 
         /** @var array<string, string> $headers */
@@ -45,6 +47,17 @@ final class PsrRequestFactory implements PsrRequestFactoryInterface
         $request->getBody()->write($workermanRequest->rawBody());
 
         return $request;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function createServerParams(WorkermanTcpConnection $workermanTcpConnection): array
+    {
+        return [
+            'REMOTE_ADDR' => $workermanTcpConnection->getRemoteIp(),
+            'REMOTE_PORT' => (string) $workermanTcpConnection->getRemotePort(),
+        ];
     }
 
     /**

@@ -20,7 +20,7 @@ final class OnMessage implements OnMessageInterface
     public function __invoke(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): void
     {
         $this->workermanResponseEmitter->emit(
-            $this->requestHander->handle($this->psrRequestFactory->create($workermanRequest)),
+            $this->requestHander->handle($this->psrRequestFactory->create($workermanTcpConnection, $workermanRequest)),
             $workermanTcpConnection
         );
     }

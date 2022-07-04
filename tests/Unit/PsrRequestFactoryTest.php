@@ -16,6 +16,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use Workerman\Connection\TcpConnection as WorkermanTcpConnection;
 use Workerman\Protocols\Http\Request as WorkermanRequest;
 
 /**
@@ -68,6 +69,12 @@ final class PsrRequestFactoryTest extends TestCase
                 ],
             ]),
             Call::create('rawBody')->with()->willReturn('This is the body.'),
+        ]);
+
+        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class, [
+            Call::create('getRemoteIp')->with()->willReturn('172.16.89.64'),
+            Call::create('getRemotePort')->with()->willReturn(10817),
         ]);
 
         /** @var MockObject|StreamInterface $requestBody */
@@ -157,11 +164,11 @@ final class PsrRequestFactoryTest extends TestCase
         /** @var MockObject|ServerRequestFactoryInterface $serverRequestFactory */
         $serverRequestFactory = $this->getMockByCalls(ServerRequestFactoryInterface::class, [
             Call::create('createServerRequest')
-                ->with('POST', '/application', [])
+                ->with('POST', '/application', ['REMOTE_ADDR' => '172.16.89.64', 'REMOTE_PORT' => '10817'])
                 ->willReturn($request),
         ]);
 
         $psrRequestFactory = new PsrRequestFactory($serverRequestFactory, $streamFactory, $uploadedFileFactory);
-        $psrRequestFactory->create($workermanRequest);
+        $psrRequestFactory->create($workermanTcpConnection, $workermanRequest);
     }
 }
