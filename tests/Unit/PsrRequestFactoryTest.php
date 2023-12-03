@@ -30,6 +30,8 @@ final class PsrRequestFactoryTest extends TestCase
 
     public function testInvoke(): void
     {
+        $bodyString = 'This is the body.';
+
         /** @var MockObject|WorkermanRequest $workermanRequest */
         $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
             Call::create('method')->with()->willReturn('POST'),
@@ -79,7 +81,7 @@ final class PsrRequestFactoryTest extends TestCase
 
         /** @var MockObject|StreamInterface $requestBody */
         $requestBody = $this->getMockByCalls(StreamInterface::class, [
-            Call::create('write')->with('This is the body.'),
+            Call::create('write')->with($bodyString)->willReturn(\strlen($bodyString)),
         ]);
 
         /** @var MockObject|StreamInterface $uploadedFileStream1 */

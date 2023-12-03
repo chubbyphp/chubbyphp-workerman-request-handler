@@ -14,8 +14,7 @@ final class OnMessage implements OnMessageInterface
         private PsrRequestFactoryInterface $psrRequestFactory,
         private WorkermanResponseEmitterInterface $workermanResponseEmitter,
         private RequestHandlerInterface $requestHander
-    ) {
-    }
+    ) {}
 
     public function __invoke(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): void
     {

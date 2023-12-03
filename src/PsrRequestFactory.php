@@ -18,8 +18,7 @@ final class PsrRequestFactory implements PsrRequestFactoryInterface
         private ServerRequestFactoryInterface $serverRequestFactory,
         private StreamFactoryInterface $streamFactory,
         private UploadedFileFactoryInterface $uploadedFileFactory
-    ) {
-    }
+    ) {}
 
     public function create(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): ServerRequestInterface
     {
