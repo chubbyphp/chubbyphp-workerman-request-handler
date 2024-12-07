@@ -54,7 +54,7 @@ final class BlackfireOnMessageAdapter implements OnMessageInterface
         try {
             return $this->client->createProbe($this->config);
         } catch (ExceptionInterface $exception) {
-            $this->logger->error(sprintf('Blackfire exception: %s', $exception->getMessage()));
+            $this->logger->error(\sprintf('Blackfire exception: %s', $exception->getMessage()));
         }
 
         return null;
@@ -65,7 +65,7 @@ final class BlackfireOnMessageAdapter implements OnMessageInterface
         try {
             $this->client->endProbe($probe);
         } catch (ExceptionInterface $exception) {
-            $this->logger->error(sprintf('Blackfire exception: %s', $exception->getMessage()));
+            $this->logger->error(\sprintf('Blackfire exception: %s', $exception->getMessage()));
         }
     }
 }

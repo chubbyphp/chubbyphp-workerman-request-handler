@@ -25,19 +25,19 @@ A request handler adapter for workerman, using PSR-7, PSR-15 and PSR-17.
 
 ## Requirements
 
- * php: ^8.1
- * [psr/http-factory][2]: ^1.0.2
+ * php: ^8.2
+ * [psr/http-factory][2]: ^1.1
  * [psr/http-message][3]: ^1.1|^2.0
  * [psr/http-server-handler][4]: ^1.0.2
- * [psr/log][5]: ^2.0|^3.0
- * [workerman/workerman][6]: ^4.1.13
+ * [psr/log][5]: ^2.0|^3.0.2
+ * [workerman/workerman][6]: ^4.2.1
 
 ## Installation
 
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-workerman-request-handler][1].
 
 ```sh
-composer require chubbyphp/chubbyphp-workerman-request-handler "^2.1"
+composer require chubbyphp/chubbyphp-workerman-request-handler "^2.2"
 ```
 
 ## Usage
