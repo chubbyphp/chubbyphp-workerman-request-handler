@@ -25,14 +25,14 @@
         "workerman/workerman": "^4.2.1"
     },
     "require-dev": {
-        "blackfire/php-sdk": "^2.5.4",
+        "blackfire/php-sdk": "^2.5.7",
         "chubbyphp/chubbyphp-dev-helper": "dev-master",
-        "chubbyphp/chubbyphp-mock": "^1.8",
-        "infection/infection": "^0.29.8",
+        "chubbyphp/chubbyphp-mock": "^2.0@dev",
+        "infection/infection": "^0.29.12",
         "php-coveralls/php-coveralls": "^2.7",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^2.0.3",
-        "phpunit/phpunit": "^11.5.0"
+        "phpstan/phpstan": "^2.1.6",
+        "phpunit/phpunit": "^11.5.9"
     },
     "autoload": {
         "psr-4": { "Chubbyphp\\WorkermanRequestHandler\\": "src/" }
