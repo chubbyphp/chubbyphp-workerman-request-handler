@@ -8,12 +8,14 @@ use Blackfire\Client;
 use Blackfire\Exception\LogicException;
 use Blackfire\Probe;
 use Blackfire\Profile\Configuration;
-use Chubbyphp\Mock\Argument\ArgumentInstanceOf;
-use Chubbyphp\Mock\Call;
-use Chubbyphp\Mock\MockByCallsTrait;
+use Chubbyphp\Mock\MockMethod\WithCallback;
+use Chubbyphp\Mock\MockMethod\WithException;
+use Chubbyphp\Mock\MockMethod\WithoutReturn;
+use Chubbyphp\Mock\MockMethod\WithReturn;
+use Chubbyphp\Mock\MockObjectBuilder;
 use Chubbyphp\WorkermanRequestHandler\Adapter\BlackfireOnMessageAdapter;
 use Chubbyphp\WorkermanRequestHandler\OnMessageInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Workerman\Connection\TcpConnection as WorkermanTcpConnection;
@@ -26,25 +28,26 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
  */
 final class BlackfireOnMessageAdapterTest extends TestCase
 {
-    use MockByCallsTrait;
-
+    #[DoesNotPerformAssertions]
     public function testInvokeWithoutHeaderWithoutConfigAndWithoutLogger(): void
     {
-        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
-        $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
+        $builder = new MockObjectBuilder();
 
-        /** @var MockObject|WorkermanRequest $workermanRequest */
-        $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
-            Call::create('header')->with('x-blackfire-query', null)->willReturn(null),
+        /** @var WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
+
+        /** @var WorkermanRequest $workermanRequest */
+        $workermanRequest = $builder->create(WorkermanRequest::class, [
+            new WithReturn('header', ['x-blackfire-query', null], null),
         ]);
 
-        /** @var MockObject|OnMessageInterface $onMessage */
-        $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
-            Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
+        /** @var OnMessageInterface $onMessage */
+        $onMessage = $builder->create(OnMessageInterface::class, [
+            new WithoutReturn('__invoke', [$workermanTcpConnection, $workermanRequest]),
         ]);
 
-        /** @var Client|MockObject $client */
-        $client = $this->getMockByCalls(Client::class);
+        /** @var Client $client */
+        $client = $builder->create(Client::class, []);
 
         $adapter = new BlackfireOnMessageAdapter($onMessage, $client);
         $adapter($workermanTcpConnection, $workermanRequest);
@@ -52,132 +55,147 @@ final class BlackfireOnMessageAdapterTest extends TestCase
 
     public function testInvokeWithoutConfigAndWithoutLogger(): void
     {
-        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
-        $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
+        $builder = new MockObjectBuilder();
 
-        /** @var MockObject|WorkermanRequest $workermanRequest */
-        $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
-            Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
+        /** @var WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
+
+        /** @var WorkermanRequest $workermanRequest */
+        $workermanRequest = $builder->create(WorkermanRequest::class, [
+            new WithReturn('header', ['x-blackfire-query', null], 'workerman'),
         ]);
 
-        /** @var MockObject|OnMessageInterface $onMessage */
-        $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
-            Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
+        /** @var OnMessageInterface $onMessage */
+        $onMessage = $builder->create(OnMessageInterface::class, [
+            new WithoutReturn('__invoke', [$workermanTcpConnection, $workermanRequest]),
         ]);
 
-        /** @var MockObject|Probe $probe */
-        $probe = $this->getMockByCalls(Probe::class);
+        /** @var Probe $probe */
+        $probe = $builder->create(Probe::class, []);
 
-        /** @var Client|MockObject $client */
-        $client = $this->getMockByCalls(Client::class, [
-            Call::create('createProbe')->with(new ArgumentInstanceOf(Configuration::class), true)->willReturn($probe),
-            Call::create('endProbe')->with($probe),
+        /** @var Client $client */
+        $client = $builder->create(Client::class, [
+            new WithCallback('createProbe', static function (Configuration $configuration, bool $enabled) use ($probe): Probe {
+                self::assertTrue($enabled);
+
+                return $probe;
+            }),
+            new WithoutReturn('endProbe', [$probe]),
         ]);
 
         $adapter = new BlackfireOnMessageAdapter($onMessage, $client);
         $adapter($workermanTcpConnection, $workermanRequest);
     }
 
+    #[DoesNotPerformAssertions]
     public function testInvokeWithConfigAndWithLogger(): void
     {
-        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
-        $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
+        $builder = new MockObjectBuilder();
 
-        /** @var MockObject|WorkermanRequest $workermanRequest */
-        $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
-            Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
+        /** @var WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
+
+        /** @var WorkermanRequest $workermanRequest */
+        $workermanRequest = $builder->create(WorkermanRequest::class, [
+            new WithReturn('header', ['x-blackfire-query', null], 'workerman'),
         ]);
 
-        /** @var MockObject|OnMessageInterface $onMessage */
-        $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
-            Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
+        /** @var OnMessageInterface $onMessage */
+        $onMessage = $builder->create(OnMessageInterface::class, [
+            new WithoutReturn('__invoke', [$workermanTcpConnection, $workermanRequest]),
         ]);
 
-        /** @var Configuration|MockObject $config */
-        $config = $this->getMockByCalls(Configuration::class);
+        /** @var Configuration $config */
+        $config = $builder->create(Configuration::class, []);
 
-        /** @var MockObject|Probe $probe */
-        $probe = $this->getMockByCalls(Probe::class);
+        /** @var Probe $probe */
+        $probe = $builder->create(Probe::class, []);
 
-        /** @var Client|MockObject $client */
-        $client = $this->getMockByCalls(Client::class, [
-            Call::create('createProbe')->with($config, true)->willReturn($probe),
-            Call::create('endProbe')->with($probe),
+        /** @var Client $client */
+        $client = $builder->create(Client::class, [
+            new WithReturn('createProbe', [$config, true], $probe),
+            new WithoutReturn('endProbe', [$probe]),
         ]);
 
-        /** @var LoggerInterface|MockObject $logger */
-        $logger = $this->getMockByCalls(LoggerInterface::class);
+        /** @var LoggerInterface $logger */
+        $logger = $builder->create(LoggerInterface::class, []);
 
         $adapter = new BlackfireOnMessageAdapter($onMessage, $client, $config, $logger);
         $adapter($workermanTcpConnection, $workermanRequest);
     }
 
+    #[DoesNotPerformAssertions]
     public function testInvokeWithExceptionOnCreateProbe(): void
     {
-        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
-        $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
+        $builder = new MockObjectBuilder();
 
-        /** @var MockObject|WorkermanRequest $workermanRequest */
-        $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
-            Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
+        /** @var WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
+
+        /** @var WorkermanRequest $workermanRequest */
+        $workermanRequest = $builder->create(WorkermanRequest::class, [
+            new WithReturn('header', ['x-blackfire-query', null], 'workerman'),
         ]);
 
-        /** @var MockObject|OnMessageInterface $onMessage */
-        $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
-            Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
+        /** @var OnMessageInterface $onMessage */
+        $onMessage = $builder->create(OnMessageInterface::class, [
+            new WithoutReturn('__invoke', [$workermanTcpConnection, $workermanRequest]),
         ]);
 
-        /** @var Configuration|MockObject $config */
-        $config = $this->getMockByCalls(Configuration::class);
+        /** @var Configuration $config */
+        $config = $builder->create(Configuration::class, []);
 
         $exception = new LogicException('Something went wrong');
 
-        /** @var Client|MockObject $client */
-        $client = $this->getMockByCalls(Client::class, [
-            Call::create('createProbe')->with($config, true)->willThrowException($exception),
+        /** @var Client $client */
+        $client = $builder->create(Client::class, [
+            new WithException('createProbe', [$config, true], $exception),
         ]);
 
-        /** @var LoggerInterface|MockObject $logger */
-        $logger = $this->getMockByCalls(LoggerInterface::class, [
-            Call::create('error')->with('Blackfire exception: Something went wrong', []),
+        /** @var LoggerInterface $logger */
+        $logger = $builder->create(LoggerInterface::class, [
+            new WithoutReturn('error', ['Blackfire exception: Something went wrong', []]),
         ]);
 
         $adapter = new BlackfireOnMessageAdapter($onMessage, $client, $config, $logger);
         $adapter($workermanTcpConnection, $workermanRequest);
     }
 
+    #[DoesNotPerformAssertions]
     public function testInvokeWithExceptionOnProbeEnd(): void
     {
-        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
-        $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
+        $builder = new MockObjectBuilder();
 
-        /** @var MockObject|WorkermanRequest $workermanRequest */
-        $workermanRequest = $this->getMockByCalls(WorkermanRequest::class, [
-            Call::create('header')->with('x-blackfire-query', null)->willReturn('workerman'),
+        /** @var WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
+
+        /** @var WorkermanRequest $workermanRequest */
+        $workermanRequest = $builder->create(WorkermanRequest::class, [
+            new WithReturn('header', ['x-blackfire-query', null], 'workerman'),
         ]);
 
-        /** @var MockObject|OnMessageInterface $onMessage */
-        $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
-            Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
+        /** @var OnMessageInterface $onMessage */
+        $onMessage = $builder->create(OnMessageInterface::class, [
+            new WithoutReturn('__invoke', [$workermanTcpConnection, $workermanRequest]),
         ]);
 
-        /** @var Configuration|MockObject $config */
-        $config = $this->getMockByCalls(Configuration::class);
+        /** @var Configuration $config */
+        $config = $builder->create(Configuration::class, []);
 
-        /** @var MockObject|Probe $probe */
-        $probe = $this->getMockByCalls(Probe::class);
+        /** @var Probe $probe */
+        $probe = $builder->create(Probe::class, []);
 
         $exception = new LogicException('Something went wrong');
 
-        /** @var Client|MockObject $client */
-        $client = $this->getMockByCalls(Client::class, [
-            Call::create('createProbe')->with($config, true)->willReturn($probe),
-            Call::create('endProbe')->with($probe)->willThrowException($exception),
+        /** @var Client $client */
+        $client = $builder->create(Client::class, [
+            new WithReturn('createProbe', [$config, true], $probe),
+            new WithException('endProbe', [$probe], $exception),
         ]);
 
-        /** @var LoggerInterface|MockObject $logger */
-        $logger = $this->getMockByCalls(LoggerInterface::class, [
-            Call::create('error')->with('Blackfire exception: Something went wrong', []),
+        /** @var LoggerInterface $logger */
+        $logger = $builder->create(LoggerInterface::class, [
+            new WithoutReturn('error', ['Blackfire exception: Something went wrong', []]),
         ]);
 
         $adapter = new BlackfireOnMessageAdapter($onMessage, $client, $config, $logger);
