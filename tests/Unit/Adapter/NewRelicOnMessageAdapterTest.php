@@ -69,14 +69,13 @@ namespace Chubbyphp\WorkermanRequestHandler\Adapter
 
 namespace Chubbyphp\Tests\WorkermanRequestHandler\Unit\Adapter
 {
-    use Chubbyphp\Mock\Call;
-    use Chubbyphp\Mock\MockByCallsTrait;
+    use Chubbyphp\Mock\MockMethod\WithoutReturn;
+    use Chubbyphp\Mock\MockObjectBuilder;
     use Chubbyphp\WorkermanRequestHandler\Adapter\NewRelicOnMessageAdapter;
     use Chubbyphp\WorkermanRequestHandler\Adapter\TestNewRelicEndTransaction;
     use Chubbyphp\WorkermanRequestHandler\Adapter\TestNewRelicStartTransaction;
     use Chubbyphp\WorkermanRequestHandler\OnMessageInterface;
     use PHPUnit\Framework\TestCase;
-    use PHPUnit\WorkermanRequestHandler\MockObject\MockObject;
     use Workerman\Connection\TcpConnection as WorkermanTcpConnection;
     use Workerman\Protocols\Http\Request as WorkermanRequest;
 
@@ -87,22 +86,22 @@ namespace Chubbyphp\Tests\WorkermanRequestHandler\Unit\Adapter
      */
     final class NewRelicOnMessageAdapterTest extends TestCase
     {
-        use MockByCallsTrait;
-
         public function testInvoke(): void
         {
             TestNewRelicStartTransaction::reset();
             TestNewRelicEndTransaction::reset();
 
-            /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
-            $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
+            $builder = new MockObjectBuilder();
 
-            /** @var MockObject|WorkermanRequest $workermanRequest */
-            $workermanRequest = $this->getMockByCalls(WorkermanRequest::class);
+            /** @var WorkermanTcpConnection $workermanTcpConnection */
+            $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
 
-            /** @var MockObject|OnMessageInterface $onMessage */
-            $onMessage = $this->getMockByCalls(OnMessageInterface::class, [
-                Call::create('__invoke')->with($workermanTcpConnection, $workermanRequest),
+            /** @var WorkermanRequest $workermanRequest */
+            $workermanRequest = $builder->create(WorkermanRequest::class, []);
+
+            /** @var OnMessageInterface $onMessage */
+            $onMessage = $builder->create(OnMessageInterface::class, [
+                new WithoutReturn('__invoke', [$workermanTcpConnection, $workermanRequest]),
             ]);
 
             $adapter = new NewRelicOnMessageAdapter($onMessage, 'myapp');

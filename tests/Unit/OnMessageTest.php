@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Chubbyphp\Tests\WorkermanRequestHandler\Unit;
 
-use Chubbyphp\Mock\Call;
-use Chubbyphp\Mock\MockByCallsTrait;
+use Chubbyphp\Mock\MockMethod\WithoutReturn;
+use Chubbyphp\Mock\MockMethod\WithReturn;
+use Chubbyphp\Mock\MockObjectBuilder;
 use Chubbyphp\WorkermanRequestHandler\OnMessage;
 use Chubbyphp\WorkermanRequestHandler\PsrRequestFactoryInterface;
 use Chubbyphp\WorkermanRequestHandler\WorkermanResponseEmitterInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,35 +25,36 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
  */
 final class OnMessageTest extends TestCase
 {
-    use MockByCallsTrait;
-
+    #[DoesNotPerformAssertions]
     public function testInvoke(): void
     {
-        /** @var MockObject|WorkermanTcpConnection $workermanTcpConnection */
-        $workermanTcpConnection = $this->getMockByCalls(WorkermanTcpConnection::class);
+        $builder = new MockObjectBuilder();
 
-        /** @var MockObject|WorkermanRequest $workermanRequest */
-        $workermanRequest = $this->getMockByCalls(WorkermanRequest::class);
+        /** @var WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
 
-        /** @var MockObject|ServerRequestInterface $request */
-        $request = $this->getMockByCalls(ServerRequestInterface::class);
+        /** @var WorkermanRequest $workermanRequest */
+        $workermanRequest = $builder->create(WorkermanRequest::class, []);
 
-        /** @var MockObject|ResponseInterface $response */
-        $response = $this->getMockByCalls(ResponseInterface::class);
+        /** @var ServerRequestInterface $request */
+        $request = $builder->create(ServerRequestInterface::class, []);
 
-        /** @var MockObject|PsrRequestFactoryInterface $psrRequestFactory */
-        $psrRequestFactory = $this->getMockByCalls(PsrRequestFactoryInterface::class, [
-            Call::create('create')->with($workermanTcpConnection, $workermanRequest)->willReturn($request),
+        /** @var ResponseInterface $response */
+        $response = $builder->create(ResponseInterface::class, []);
+
+        /** @var PsrRequestFactoryInterface $psrRequestFactory */
+        $psrRequestFactory = $builder->create(PsrRequestFactoryInterface::class, [
+            new WithReturn('create', [$workermanTcpConnection, $workermanRequest], $request),
         ]);
 
-        /** @var MockObject|WorkermanResponseEmitterInterface $workermanResponseEmitter */
-        $workermanResponseEmitter = $this->getMockByCalls(WorkermanResponseEmitterInterface::class, [
-            Call::create('emit')->with($response, $workermanTcpConnection),
+        /** @var WorkermanResponseEmitterInterface $workermanResponseEmitter */
+        $workermanResponseEmitter = $builder->create(WorkermanResponseEmitterInterface::class, [
+            new WithoutReturn('emit', [$response, $workermanTcpConnection]),
         ]);
 
-        /** @var MockObject|RequestHandlerInterface $workermanRequestHandler */
-        $workermanRequestHandler = $this->getMockByCalls(RequestHandlerInterface::class, [
-            Call::create('handle')->with($request)->willReturn($response),
+        /** @var RequestHandlerInterface $workermanRequestHandler */
+        $workermanRequestHandler = $builder->create(RequestHandlerInterface::class, [
+            new WithReturn('handle', [$request], $response),
         ]);
 
         $onMessage = new OnMessage($psrRequestFactory, $workermanResponseEmitter, $workermanRequestHandler);
