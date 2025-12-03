@@ -46,10 +46,10 @@ final class WorkermanResponseEmitterTest extends TestCase
         /** @var WorkermanTcpConnection $workermanTcpConnection */
         $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, [
             new WithCallback('send', static function (WorkermanResponse $workermanResponse, $flag) use ($headers): void {
-                self::assertSame(200, self::getWorkermanResponseProperty($workermanResponse, '_status'));
-                self::assertSame('OK', self::getWorkermanResponseProperty($workermanResponse, '_reason'));
-                self::assertSame($headers, self::getWorkermanResponseProperty($workermanResponse, '_header'));
-                self::assertSame('This is the body.', self::getWorkermanResponseProperty($workermanResponse, '_body'));
+                self::assertSame(200, self::getWorkermanResponseProperty($workermanResponse, 'status'));
+                self::assertSame('OK', self::getWorkermanResponseProperty($workermanResponse, 'reason'));
+                self::assertSame($headers, self::getWorkermanResponseProperty($workermanResponse, 'headers'));
+                self::assertSame('This is the body.', self::getWorkermanResponseProperty($workermanResponse, 'body'));
                 self::assertFalse($flag);
             }),
         ]);
