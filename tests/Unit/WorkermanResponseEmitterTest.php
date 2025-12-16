@@ -61,7 +61,6 @@ final class WorkermanResponseEmitterTest extends TestCase
     private static function getWorkermanResponseProperty(WorkermanResponse $workermanResponse, string $property)
     {
         $reflectionProperty = new \ReflectionProperty($workermanResponse, $property);
-        $reflectionProperty->setAccessible(true);
 
         return $reflectionProperty->getValue($workermanResponse);
     }
