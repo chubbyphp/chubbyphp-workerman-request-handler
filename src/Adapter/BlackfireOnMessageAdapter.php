@@ -17,10 +17,10 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
 final class BlackfireOnMessageAdapter implements OnMessageInterface
 {
     public function __construct(
-        private OnMessageInterface $onRequest,
-        private Client $client,
-        private Configuration $config = new Configuration(),
-        private LoggerInterface $logger = new NullLogger()
+        private readonly OnMessageInterface $onRequest,
+        private readonly Client $client,
+        private readonly Configuration $config = new Configuration(),
+        private readonly LoggerInterface $logger = new NullLogger()
     ) {}
 
     public function __invoke(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): void

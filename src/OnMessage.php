@@ -11,9 +11,9 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
 final class OnMessage implements OnMessageInterface
 {
     public function __construct(
-        private PsrRequestFactoryInterface $psrRequestFactory,
-        private WorkermanResponseEmitterInterface $workermanResponseEmitter,
-        private RequestHandlerInterface $requestHander
+        private readonly PsrRequestFactoryInterface $psrRequestFactory,
+        private readonly WorkermanResponseEmitterInterface $workermanResponseEmitter,
+        private readonly RequestHandlerInterface $requestHander
     ) {}
 
     public function __invoke(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): void

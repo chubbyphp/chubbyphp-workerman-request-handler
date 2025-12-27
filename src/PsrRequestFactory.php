@@ -15,9 +15,9 @@ use Workerman\Protocols\Http\Request as WorkermanRequest;
 final class PsrRequestFactory implements PsrRequestFactoryInterface
 {
     public function __construct(
-        private ServerRequestFactoryInterface $serverRequestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private UploadedFileFactoryInterface $uploadedFileFactory
+        private readonly ServerRequestFactoryInterface $serverRequestFactory,
+        private readonly StreamFactoryInterface $streamFactory,
+        private readonly UploadedFileFactoryInterface $uploadedFileFactory
     ) {}
 
     public function create(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): ServerRequestInterface
