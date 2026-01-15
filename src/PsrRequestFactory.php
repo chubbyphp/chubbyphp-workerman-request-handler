@@ -39,9 +39,19 @@ final class PsrRequestFactory implements PsrRequestFactoryInterface
         $cookies = $workermanRequest->cookie();
 
         $request = $request->withCookieParams($cookies);
-        $request = $request->withQueryParams($workermanRequest->get());
-        $request = $request->withParsedBody($workermanRequest->post());
-        $request = $request->withUploadedFiles($this->uploadedFiles($workermanRequest->file()));
+
+        /** @var array<string, string> $queryParams */
+        $queryParams = $workermanRequest->get() ?? [];
+
+        /** @var null|array<string, mixed>|object $parsedBody */
+        $parsedBody = $workermanRequest->post();
+
+        /** @var array<string, array<string, mixed>> $uploadedFilesData */
+        $uploadedFilesData = $workermanRequest->file() ?? [];
+
+        $request = $request->withQueryParams($queryParams);
+        $request = $request->withParsedBody($parsedBody);
+        $request = $request->withUploadedFiles($this->uploadedFiles($uploadedFilesData));
 
         $request->getBody()->write($workermanRequest->rawBody());
 
@@ -60,22 +70,28 @@ final class PsrRequestFactory implements PsrRequestFactoryInterface
     }
 
     /**
-     * @param array<string, array<string, int|string>> $files
+     * @param array<string, array<string, mixed>> $files
      *
-     * @return array<string, UploadedFileInterface>
+     * @return array<string, mixed>
      */
     private function uploadedFiles(array $files): array
     {
         $uploadedFiles = [];
         foreach ($files as $key => $file) {
-            $uploadedFiles[$key] = isset($file['tmp_name']) ? $this->createUploadedFile($file) : $this->uploadedFiles($file);
+            if (isset($file['tmp_name'])) {
+                /** @var array{tmp_name: string, size: null|int, error: int, name: null|string, type: null|string} $file */
+                $uploadedFiles[$key] = $this->createUploadedFile($file);
+            } else {
+                /** @var array<string, array<string, mixed>> $file */
+                $uploadedFiles[$key] = $this->uploadedFiles($file);
+            }
         }
 
         return $uploadedFiles;
     }
 
     /**
-     * @param array<string, int|string> $file
+     * @param array{tmp_name: string, size: null|int, error: int, name: null|string, type: null|string} $file
      */
     private function createUploadedFile(array $file): UploadedFileInterface
     {
