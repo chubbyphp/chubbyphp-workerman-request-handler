@@ -30,7 +30,7 @@ A request handler adapter for workerman, using PSR-7, PSR-15 and PSR-17.
  * [psr/http-message][3]: ^1.1|^2.0
  * [psr/http-server-handler][4]: ^1.0.2
  * [psr/log][5]: ^2.0|^3.0.2
- * [workerman/workerman][6]: ^5.1.6
+ * [workerman/workerman][6]: ^5.1.8
 
 ## Installation
 
