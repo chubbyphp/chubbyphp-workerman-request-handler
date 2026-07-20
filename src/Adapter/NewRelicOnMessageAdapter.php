@@ -16,8 +16,10 @@ final class NewRelicOnMessageAdapter implements OnMessageInterface
     {
         newrelic_start_transaction($this->appname);
 
-        $this->onRequest->__invoke($workermanTcpConnection, $workermanRequest);
-
-        newrelic_end_transaction();
+        try {
+            $this->onRequest->__invoke($workermanTcpConnection, $workermanRequest);
+        } finally {
+            newrelic_end_transaction();
+        }
     }
 }

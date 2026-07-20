@@ -110,5 +110,42 @@ namespace Chubbyphp\Tests\WorkermanRequestHandler\Unit\Adapter
             self::assertSame([['appname' => 'myapp', 'license' => null]], TestNewRelicStartTransaction::all());
             self::assertSame([['ignore' => false]], TestNewRelicEndTransaction::all());
         }
+
+        public function testInvokeEndsTransactionWhenRequestHandlingFails(): void
+        {
+            TestNewRelicStartTransaction::reset();
+            TestNewRelicEndTransaction::reset();
+
+            $builder = new MockObjectBuilder();
+
+            /** @var WorkermanTcpConnection $workermanTcpConnection */
+            $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
+
+            /** @var WorkermanRequest $workermanRequest */
+            $workermanRequest = $builder->create(WorkermanRequest::class, []);
+
+            $exception = new \RuntimeException('Request handling failed');
+
+            $onMessage = new class($exception) implements OnMessageInterface {
+                public function __construct(private readonly \RuntimeException $exception) {}
+
+                public function __invoke(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): void
+                {
+                    throw $this->exception;
+                }
+            };
+
+            $adapter = new NewRelicOnMessageAdapter($onMessage, 'myapp');
+
+            try {
+                $adapter($workermanTcpConnection, $workermanRequest);
+                self::fail('Expected the request handler exception to be rethrown.');
+            } catch (\RuntimeException $caughtException) {
+                self::assertSame($exception, $caughtException);
+            }
+
+            self::assertSame([['appname' => 'myapp', 'license' => null]], TestNewRelicStartTransaction::all());
+            self::assertSame([['ignore' => false]], TestNewRelicEndTransaction::all());
+        }
     }
 }
