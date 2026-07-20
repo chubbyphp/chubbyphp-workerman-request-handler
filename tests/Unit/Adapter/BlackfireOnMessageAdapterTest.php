@@ -201,4 +201,44 @@ final class BlackfireOnMessageAdapterTest extends TestCase
         $adapter = new BlackfireOnMessageAdapter($onMessage, $client, $config, $logger);
         $adapter($workermanTcpConnection, $workermanRequest);
     }
+
+    public function testInvokeEndsProbeWhenRequestHandlingFails(): void
+    {
+        $builder = new MockObjectBuilder();
+
+        /** @var WorkermanTcpConnection $workermanTcpConnection */
+        $workermanTcpConnection = $builder->create(WorkermanTcpConnection::class, []);
+
+        /** @var WorkermanRequest $workermanRequest */
+        $workermanRequest = $builder->create(WorkermanRequest::class, [
+            new WithReturn('header', ['x-blackfire-query', null], 'workerman'),
+        ]);
+
+        $exception = new \RuntimeException('Request handling failed');
+
+        $onMessage = new class($exception) implements OnMessageInterface {
+            public function __construct(private readonly \RuntimeException $exception) {}
+
+            public function __invoke(WorkermanTcpConnection $workermanTcpConnection, WorkermanRequest $workermanRequest): void
+            {
+                throw $this->exception;
+            }
+        };
+
+        /** @var Probe $probe */
+        $probe = $builder->create(Probe::class, []);
+
+        $config = new Configuration();
+
+        /** @var Client $client */
+        $client = $builder->create(Client::class, [
+            new WithReturn('createProbe', [$config, true], $probe),
+            new WithoutReturn('endProbe', [$probe]),
+        ]);
+
+        $adapter = new BlackfireOnMessageAdapter($onMessage, $client, $config);
+
+        $this->expectExceptionObject($exception);
+        $adapter($workermanTcpConnection, $workermanRequest);
+    }
 }

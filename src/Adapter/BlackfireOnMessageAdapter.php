@@ -33,13 +33,13 @@ final class BlackfireOnMessageAdapter implements OnMessageInterface
 
         $probe = $this->startProbe();
 
-        $this->onRequest->__invoke($workermanTcpConnection, $workermanRequest);
-
-        if (!$probe instanceof Probe) {
-            return;
+        try {
+            $this->onRequest->__invoke($workermanTcpConnection, $workermanRequest);
+        } finally {
+            if ($probe instanceof Probe) {
+                $this->endProbe($probe);
+            }
         }
-
-        $this->endProbe($probe);
     }
 
     private function startProbe(): ?Probe
