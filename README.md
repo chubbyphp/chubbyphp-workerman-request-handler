@@ -21,7 +21,14 @@
 
 ## Description
 
-A request handler adapter for workerman, using PSR-7, PSR-15 and PSR-17.
+A request handler adapter for [workerman][6], using PSR-7, PSR-15 and PSR-17.
+
+It turns a [workerman][6] HTTP `Worker` into a runtime for any [PSR-15][7] request handler: each incoming
+workerman request is converted into a [PSR-7][8] server request through [PSR-17][9] factories, handed to your
+application, and the returned PSR-7 response is sent back over the workerman connection.
+
+Because workerman is a long-running process, your application is bootstrapped once per worker process and then
+serves many requests. This removes the per-request bootstrap cost of a classic PHP-FPM setup.
 
 ## Requirements
 
@@ -32,6 +39,16 @@ A request handler adapter for workerman, using PSR-7, PSR-15 and PSR-17.
  * [psr/log][5]: ^2.0|^3.0.2
  * [workerman/workerman][6]: ^5.2.2
 
+## Suggest
+
+Any [PSR-7][8] / [PSR-17][9] implementation can be used, for example:
+
+ * [guzzlehttp/psr7][10] (with [http-interop/http-factory-guzzle][11])
+ * [laminas/laminas-diactoros][12]
+ * [nyholm/psr7][13]
+ * [slim/psr7][14]
+ * [sunrise/http-message][15]
+
 ## Installation
 
 Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-workerman-request-handler][1].
@@ -40,7 +57,17 @@ Through [Composer](http://getcomposer.org) as [chubbyphp/chubbyphp-workerman-req
 composer require chubbyphp/chubbyphp-workerman-request-handler "^2.3"
 ```
 
+The examples below use [slim/psr7][14] as the PSR-7 / PSR-17 implementation:
+
+```sh
+composer require slim/psr7 "^1.8"
+```
+
 ## Usage
+
+### Basic server
+
+Create a `server.php` and start it with `php server.php start` (add `-d` to daemonize):
 
 ```php
 <?php
@@ -53,21 +80,22 @@ use Chubbyphp\WorkermanRequestHandler\OnMessage;
 use Chubbyphp\WorkermanRequestHandler\PsrRequestFactory;
 use Chubbyphp\WorkermanRequestHandler\WorkermanResponseEmitter;
 use Psr\Http\Server\RequestHandlerInterface;
-use Some\Psr17\Factory\ServerRequestFactory;
-use Some\Psr17\Factory\StreamFactory;
-use Some\Psr17\Factory\UploadedFileFactory;
+use Slim\Psr7\Factory\ServerRequestFactory;
+use Slim\Psr7\Factory\StreamFactory;
+use Slim\Psr7\Factory\UploadedFileFactory;
 use Workerman\Worker;
 
-$loader = require __DIR__.'/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
-/** @var RequestHandlerInterface $app*/
-$app = ...;
+/** @var RequestHandlerInterface $app */
+$app = ...; // your PSR-15 application, bootstrapped once per worker process
 
 $http = new Worker('http://0.0.0.0:8080');
 
+// number of worker processes, typically the number of CPU cores
 $http->count = 4;
 
-$http->onWorkerStart = function () {
+$http->onWorkerStart = static function (): void {
     echo 'Workerman http server is started at http://0.0.0.0:8080'.PHP_EOL;
 };
 
@@ -84,7 +112,44 @@ $http->onMessage = new OnMessage(
 Worker::runAll();
 ```
 
-### with blackfire
+### Components
+
+The package consists of three small, replaceable parts. Each one has an interface, so you can swap in your own
+implementation where the defaults don't fit.
+
+| Class                       | Interface                            | Responsibility                                                                                                 |
+|-----------------------------|--------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| `OnMessage`                 | `OnMessageInterface`                 | Workerman `onMessage` callback: builds the PSR-7 request, calls the PSR-15 handler and emits the response.    |
+| `PsrRequestFactory`         | `PsrRequestFactoryInterface`         | Converts a workerman request into a PSR-7 server request via the given PSR-17 factories.                       |
+| `WorkermanResponseEmitter`  | `WorkermanResponseEmitterInterface`  | Converts a PSR-7 response into a workerman response and sends it over the connection.                          |
+
+`PsrRequestFactory` maps the following data:
+
+ * method, URI and all headers
+ * cookies, query params and the parsed body (form data)
+ * uploaded files, including nested ones (as `UploadedFileInterface` instances)
+ * the raw body, written to the request body stream
+ * server params `REMOTE_ADDR` and `REMOTE_PORT` from the TCP connection
+
+### Long-running process caveats
+
+Workerman keeps the PHP process alive between requests, which differs from PHP-FPM:
+
+ * Superglobals like `$_GET`, `$_POST`, `$_SERVER` or `$_COOKIE` are not populated. Read everything from the
+   PSR-7 request instead.
+ * Anything you keep in static properties or in long-lived services persists across requests. Avoid request
+   specific state in shared objects, or reset it per request.
+ * Only `REMOTE_ADDR` and `REMOTE_PORT` are available as server params. If you run behind a reverse proxy,
+   use a middleware such as [chubbyphp/chubbyphp-trusted-proxy][16] to resolve the client IP from headers.
+
+### With Blackfire
+
+`BlackfireOnMessageAdapter` wraps an `OnMessageInterface` and profiles a request whenever the
+`X-Blackfire-Query` header is present, for example when triggered by the Blackfire browser extension or the
+`blackfire curl` command. Requests without that header pass through untouched. The probe is always ended,
+even if the wrapped handler throws.
+
+Requires the `blackfire` extension and the [blackfire/php-sdk][17] package.
 
 ```php
 <?php
@@ -94,20 +159,36 @@ declare(strict_types=1);
 namespace App;
 
 use Blackfire\Client;
+use Blackfire\Profile\Configuration;
 use Chubbyphp\WorkermanRequestHandler\Adapter\BlackfireOnMessageAdapter;
-use Chubbyphp\WorkermanRequestHandler\OnMessage;
+use Chubbyphp\WorkermanRequestHandler\OnMessageInterface;
+use Psr\Log\LoggerInterface;
 
-/** @var OnMessage $onMessage */
+/** @var OnMessageInterface $onMessage */
 $onMessage = ...;
 
-if (extension_loaded('blackfire') {
-    $onMessage = new BlackfireOnMessageAdapter($onMessage, new Client());
+/** @var LoggerInterface $logger */
+$logger = ...;
+
+if (extension_loaded('blackfire')) {
+    $onMessage = new BlackfireOnMessageAdapter(
+        $onMessage,
+        new Client(),
+        new Configuration(), // optional, defaults to new Configuration()
+        $logger              // optional, defaults to a NullLogger; receives Blackfire client errors
+    );
 }
 
 $http->onMessage = $onMessage;
 ```
 
-### with newrelic
+### With New Relic
+
+`NewRelicOnMessageAdapter` wraps an `OnMessageInterface` and starts a New Relic transaction for every request.
+The transaction is always ended, even if the wrapped handler throws, so each request is reported separately
+instead of as one endless transaction per worker process.
+
+Requires the `newrelic` extension.
 
 ```php
 <?php
@@ -117,17 +198,19 @@ declare(strict_types=1);
 namespace App;
 
 use Chubbyphp\WorkermanRequestHandler\Adapter\NewRelicOnMessageAdapter;
-use Chubbyphp\WorkermanRequestHandler\OnMessage;
+use Chubbyphp\WorkermanRequestHandler\OnMessageInterface;
 
-/** @var OnMessage $onMessage */
+/** @var OnMessageInterface $onMessage */
 $onMessage = ...;
 
-if (extension_loaded('newrelic') && false !== $name = ini_get('newrelic.appname')) {
-    $onMessage = new NewRelicOnMessageAdapter($onMessage, $name);
+if (extension_loaded('newrelic') && false !== $appname = ini_get('newrelic.appname')) {
+    $onMessage = new NewRelicOnMessageAdapter($onMessage, $appname);
 }
 
 $http->onMessage = $onMessage;
 ```
+
+Both adapters implement `OnMessageInterface`, so they can be combined by nesting them.
 
 ## Copyright
 
@@ -139,3 +222,14 @@ $http->onMessage = $onMessage;
 [4]: https://packagist.org/packages/psr/http-server-handler
 [5]: https://packagist.org/packages/psr/log
 [6]: https://packagist.org/packages/workerman/workerman
+[7]: https://www.php-fig.org/psr/psr-15
+[8]: https://www.php-fig.org/psr/psr-7
+[9]: https://www.php-fig.org/psr/psr-17
+[10]: https://packagist.org/packages/guzzlehttp/psr7
+[11]: https://packagist.org/packages/http-interop/http-factory-guzzle
+[12]: https://packagist.org/packages/laminas/laminas-diactoros
+[13]: https://packagist.org/packages/nyholm/psr7
+[14]: https://packagist.org/packages/slim/psr7
+[15]: https://packagist.org/packages/sunrise/http-message
+[16]: https://packagist.org/packages/chubbyphp/chubbyphp-trusted-proxy
+[17]: https://packagist.org/packages/blackfire/php-sdk
