@@ -37,7 +37,7 @@ serves many requests. This removes the per-request bootstrap cost of a classic P
  * [psr/http-message][3]: ^1.1|^2.0
  * [psr/http-server-handler][4]: ^1.0.2
  * [psr/log][5]: ^2.0|^3.0.2
- * [workerman/workerman][6]: ^5.2.2
+ * [workerman/workerman][6]: ^5.2.3
 
 ## Suggest
 
